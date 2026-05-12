@@ -16,7 +16,11 @@ public class IssueRecord {
 
     private LocalDate issueDate;
 
+    private LocalDate dueDate;
+
     private LocalDate returnDate;
+
+    private String status;
 
     @ManyToOne
     @JoinColumn(name = "book_id")
