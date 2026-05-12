@@ -1,9 +1,9 @@
-package com.library.backend.controllers;
+package com.library.server.controllers;
 
-import com.library.backend.models.Member;
-import com.library.backend.models.IssueRecord;
-import com.library.backend.services.MemberService;
-import com.library.backend.services.IssueService;
+import com.library.server.models.Member;
+import com.library.server.models.IssueRecord;
+import com.library.server.services.MemberService;
+import com.library.server.services.IssueService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -42,4 +42,11 @@ public class MemberController {
             return ResponseEntity.badRequest().build();
         }
     }
+    @GetMapping
+public ResponseEntity<List<Member>> getAllMembers() {
+
+    return ResponseEntity.ok(
+            memberService.getAllMembers()
+    );
+}
 }

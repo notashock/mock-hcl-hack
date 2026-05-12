@@ -1,9 +1,11 @@
-package com.library.backend.services;
+package com.library.server.services;
 
-import com.library.backend.models.Book;
-import com.library.backend.models.IssueRecord;
-import com.library.backend.models.Member;
-import com.library.backend.repositories.IssueRecordRepository;
+import com.library.server.models.Book;
+import com.library.server.models.IssueRecord;
+import com.library.server.models.Member;
+
+import com.library.server.repositories.IssueRecordRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,52 +24,136 @@ public class IssueService {
     @Autowired
     private MemberService memberService;
 
-    public IssueRecord issueBook(Long memberId, Long bookId) {
-        Member member = memberService.getMemberById(memberId);
-        Book book = bookService.getBookById(bookId);
+    // Issue Book
+    public IssueRecord issueBook(
+            Long memberId,
+            Long bookId
+    ) {
 
+        Member member =
+                memberService.getMemberById(memberId);
+
+        Book book =
+                bookService.getBookById(bookId);
+
+        // Validation
         if (member == null || book == null) {
-            throw new IllegalArgumentException("Invalid Member ID or Book ID");
+
+            throw new IllegalArgumentException(
+                    "Invalid Member ID or Book ID"
+            );
         }
 
-        if (!book.getAvailability()) {
-            throw new IllegalStateException("Book is currently not available");
+        // Book Availability
+        if (!book.getAvailable()) {
+
+            throw new IllegalStateException(
+                    "Book is currently unavailable"
+            );
         }
 
-        long activeIssues = issueRecordRepository.countByMemberAndReturnDateIsNull(member);
+        // Max Books Limit
+        long activeIssues =
+                issueRecordRepository
+                        .countByMemberAndReturnDateIsNull(
+                                member
+                        );
+
         if (activeIssues >= 3) {
-            throw new IllegalStateException("Member has already issued the maximum number of books (3)");
+
+            throw new IllegalStateException(
+                    "Maximum issue limit reached"
+            );
         }
 
-        book.setAvailability(false);
+        // Update Book Availability
+        book.setAvailable(false);
+
         bookService.updateBook(book);
 
-        IssueRecord issueRecord = new IssueRecord(member, book, LocalDate.now());
-        return issueRecordRepository.save(issueRecord);
+        // Create Issue Record
+        IssueRecord issueRecord =
+                new IssueRecord();
+
+        issueRecord.setBook(book);
+
+        issueRecord.setMember(member);
+
+        issueRecord.setIssueDate(
+                LocalDate.now()
+        );
+
+        issueRecord.setDueDate(
+                LocalDate.now().plusDays(7)
+        );
+
+        issueRecord.setStatus("ISSUED");
+
+        return issueRecordRepository.save(
+                issueRecord
+        );
     }
 
+    // Return Book
     public IssueRecord returnBook(Long issueId) {
-        IssueRecord issueRecord = issueRecordRepository.findById(issueId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid Issue ID"));
+
+        IssueRecord issueRecord =
+                issueRecordRepository.findById(issueId)
+                        .orElseThrow(() ->
+                                new IllegalArgumentException(
+                                        "Invalid Issue ID"
+                                )
+                        );
 
         if (issueRecord.getReturnDate() != null) {
-            throw new IllegalStateException("Book has already been returned");
+
+            throw new IllegalStateException(
+                    "Book already returned"
+            );
         }
 
-        issueRecord.setReturnDate(LocalDate.now());
+        // Update Return Details
+        issueRecord.setReturnDate(
+                LocalDate.now()
+        );
 
+        issueRecord.setStatus("RETURNED");
+
+        // Make Book Available Again
         Book book = issueRecord.getBook();
-        book.setAvailability(true);
+
+        book.setAvailable(true);
+
         bookService.updateBook(book);
 
-        return issueRecordRepository.save(issueRecord);
+        return issueRecordRepository.save(
+                issueRecord
+        );
     }
 
-    public List<IssueRecord> getIssuesByMember(Long memberId) {
-        Member member = memberService.getMemberById(memberId);
+    // Get All Issues
+    public List<IssueRecord> getAllIssues() {
+
+        return issueRecordRepository.findAll();
+    }
+
+    // Get Issues By Member
+    public List<IssueRecord> getIssuesByMember(
+            Long memberId
+    ) {
+
+        Member member =
+                memberService.getMemberById(memberId);
+
         if (member == null) {
-            throw new IllegalArgumentException("Invalid Member ID");
+
+            throw new IllegalArgumentException(
+                    "Invalid Member ID"
+            );
         }
-        return issueRecordRepository.findByMember(member);
+
+        return issueRecordRepository.findByMember(
+                member
+        );
     }
 }

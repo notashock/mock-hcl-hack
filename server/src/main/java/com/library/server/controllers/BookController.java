@@ -1,10 +1,13 @@
-package com.library.backend.controllers;
+package com.library.server.controllers;
 
-import com.library.backend.models.Book;
-import com.library.backend.services.BookService;
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import com.library.server.models.Book;
+import com.library.server.services.BookService;
 
 import java.util.List;
 
