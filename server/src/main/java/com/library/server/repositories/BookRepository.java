@@ -1,6 +1,7 @@
-package com.library.backend.repositories;
+package com.library.server.repositories;
 
-import com.library.backend.models.Book;
+import com.library.server.models.Book;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -8,6 +9,16 @@ import java.util.List;
 
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long> {
-    List<Book> findByAvailabilityTrue();
-    List<Book> findByTitleContainingIgnoreCaseOrAuthorContainingIgnoreCase(String title, String author);
+
+    // Get Available Books
+    List<Book> findByAvailableTrue();
+
+    // Search by Title or Author
+    List<Book> findByTitleContainingIgnoreCaseOrAuthorContainingIgnoreCase(
+            String title,
+            String author
+    );
+
+    // Find by ISBN
+    Book findByIsbn(String isbn);
 }

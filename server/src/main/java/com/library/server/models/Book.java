@@ -1,62 +1,31 @@
-package com.library.backend.models;
+package com.library.server.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import lombok.Data;
 
 @Entity
+@Data
+@Table(name = "books")
 public class Book {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long bookId;
+    private Long id;
 
     private String title;
+
     private String author;
-    
-    // Default to true when adding a new book
-    private Boolean availability = true;
 
-    // Constructors
-    public Book() {}
+    @Column(unique = true, nullable = false)
+    private String isbn;
 
-    public Book(String title, String author, Boolean availability) {
-        this.title = title;
-        this.author = author;
-        this.availability = availability;
-    }
+    private String publisher;
 
-    // Getters and Setters
-    public Long getBookId() {
-        return bookId;
-    }
+    private Integer publicationYear;
 
-    public void setBookId(Long bookId) {
-        this.bookId = bookId;
-    }
+    private String edition;
 
-    public String getTitle() {
-        return title;
-    }
+    private Double price;
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
-    }
-
-    public Boolean getAvailability() {
-        return availability;
-    }
-
-    public void setAvailability(Boolean availability) {
-        this.availability = availability;
-    }
+    private Boolean available = true;
 }
